@@ -1,0 +1,123 @@
+---
+title: "Singapore Population Pyramid"
+author: "Kelly Ng"
+date: "3/9/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+I need the following packages for this project
+```{r}
+library(tidyverse)
+library(readxl)
+library(scales)
+```
+
+### 1. Importing data.
+T2 (Table Title: Singapore Residents By Age Group, Ethnic Group And Sex, End June, Annual) is the relevant spreadsheet for this project. In particular, the first rows below "Total Residents", all the way until "90 Years & Over". Missing data values are represented by "na" in the cell. 
+```{r}
+sg <- read_excel(
+  "outputFile.xlsx",
+  sheet = "T2",
+  na = "na",
+  skip = 10
+) |>
+  slice(c(27:50, 52:75))
+```
+
+### 2. Plotting the pyramids for the years 1960-2020. 
+```{r}
+sg <- sg |>
+  select(age = `Data Series`, ends_with("0"))
+```
+
+### 3. Changing strings such as "`65 Years & Over`" to "`>65`" and removing the trailing pattern `Years` from all strings to make the following tasks easier.
+```{r}
+sg <- mutate(
+  sg,
+  age = str_replace(age, "(,*) Years & Over$", ">\\1") |>
+    str_remove(" Years") |>
+    (\(x) {
+      factor(x, levels = unique(x))
+    })()
+)
+
+levels(sg$age)
+```
+
+### 4. Appending a column to `sg` that indicates `sex`.
+```{r}
+sg <- mutate(
+  sg,
+  sex = rep(c("male", "female"), each = nrow(sg) / 2)
+)
+```
+
+### 5. Editting the data.
+The data for the year 1960 has `age` brackets "65-69", ">65" and ">70". Only the rows for "65-69" and ">70" contain independent pieces of information. Therefore, the data has to be edited so that the value for ">70" (for `age`) is filled into the age group "70-74, which is currently `NA`. We have to do this because people in the group ">70" could be older than 74. 
+```{r}
+# Male
+sg[18, "1990"] <- sg[23, "1990"]
+sg[18, "1980"] <- sg[23, "1980"]
+sg[17, "1970"] <- sg[22, "1970"]
+sg[15, "1960"] <- sg[20, "1960"]
+
+# Female
+sg[42, "1990"] <- sg[47, "1990"]
+sg[42, "1980"] <- sg[47, "1980"]
+sg[41, "1970"] <- sg[46, "1970"]
+sg[39, "1960"] <- sg[44, "1960"]
+```
+
+### 6. Removing the rows that don't correspond to age groups "0-4", ..., "85-90" and ">90". 
+```{r}
+sg <- sg[-c(19:23, 43:47), ]
+```
+
+### 7. Pivoting the data so that it contains columns: 
+- `age` 
+- `sex`
+- `year` 
+- `pop` (population size)
+```{r}
+sg <- pivot_longer(
+  sg,
+  ends_with("0"),
+  names_to = "year",
+  values_to = "pop"
+)
+```
+
+### 8. PFaceted Population pyramid plot: 
+```{r, fig.align='center', fig.height=7, fig.width=10}
+# Creating a new pop column to plot, where "male" values are negative so the male column will be plotted towards   the left
+sg$pop2 <- if_else(sg$sex == "male",
+  sg$pop2 <- sg$pop * (-1),
+  sg$pop2 <- sg$pop
+)
+
+# Creating a function to combine plotting labels with commas and their absolute values
+abs_comma <- function(x) {
+  comma(abs(x))
+}
+
+# Creating the plot
+ggplot(sg, aes(pop2, age, fill = sex)) +
+  geom_col() +
+  facet_wrap(~year, ncol = 4) +
+  labs(
+    title = "Singapore Resident Population between 1960 and 2020",
+    x = "Population",
+    y = "Age (years)",
+    caption = "Source: Department of Statistics Singapore"
+  ) +
+  theme(legend.position = c(0.9, 0.2)) +
+  scale_fill_manual(name = "Sex", values = c("steelblue3", "red3"), labels = c("female", "male")) +
+  scale_x_continuous(labels = abs_comma)
+```
+
+### 9. What does the plot tell us about the development of Singapore's resident population from 1960-2020. 
+The plot shows that over the years, there has been an increase in older residents, eventually making a higher proportion of the total population. This suggests an increasing aging population in Singapore. Whereas, the younger population has declined slightly from 1960, all the way till 1980. After that, the younger population has very roughly remained the same, 
