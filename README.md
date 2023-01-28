@@ -6,3 +6,5 @@ For easy access to sg_population_pyramid.html: https://kellyngsf.github.io/sg_po
 
 # Findings
 A faceted population pyramid plot was made to show the changes in Singapore's population over the years from 1960 to 2020 (the plot is shown below). From this project, it was found that there is an increasing aging population in Singapore, which is shown through the wider growing bars near the top of the population pyramid. For the middle-aged group, there is a noticable bulge, especially from 1990 onwards, for example, in 2020, there are more Singaporeans aged from 65 to 90 than Singaporeans aged between 0 to 4. Finally, the younger population has slightly declined from 1960 till 1980. After that, the younger population has roughly remained the same. And regarding changes in the gender population, the population pyramids are slightly asymmetric because women tend to live longer than men. 
+
+![](https://github.com/kellyngsf/sg_population_pyramid/blob/main/images/sg_population_pyramid_img.png)
