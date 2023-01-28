@@ -91,7 +91,7 @@ sg <- pivot_longer(
 )
 ```
 
-### 8. PFaceted Population pyramid plot: 
+### 8. Faceted Population pyramid plot: 
 ```{r, fig.align='center', fig.height=7, fig.width=10}
 # Creating a new pop column to plot, where "male" values are negative so the male column will be plotted towards   the left
 sg$pop2 <- if_else(sg$sex == "male",

@@ -454,8 +454,8 @@ sg[39, &quot;1960&quot;] &lt;- sg[44, &quot;1960&quot;]</code></pre>
   values_to = &quot;pop&quot;
 )</code></pre>
 </div>
-<div id="pfaceted-population-pyramid-plot" class="section level3">
-<h3>8. PFaceted Population pyramid plot:</h3>
+<div id="faceted-population-pyramid-plot" class="section level3">
+<h3>8. Faceted Population pyramid plot:</h3>
 <pre class="r"><code># Creating a new pop column to plot, where &quot;male&quot; values are negative so the male column will be plotted towards   the left
 sg$pop2 &lt;- if_else(sg$sex == &quot;male&quot;,
   sg$pop2 &lt;- sg$pop * (-1),
